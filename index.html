@@ -37,91 +37,182 @@ select{border:1px solid var(--line);border-radius:9px;background:white;padding:9
 .hint{background:#edf8f1;border-color:#cbead6}.hint p{font-size:13px;color:#375b45;margin:0}
 .empty{background:white;border:1px dashed #c9d5e3;padding:28px;text-align:center;border-radius:14px;color:var(--muted)}
 .modal-back{position:fixed;inset:0;background:#0c1d35a6;display:none;align-items:center;justify-content:center;padding:16px;z-index:5}.modal-back.open{display:flex}.modal{background:#fff;border-radius:16px;width:min(520px,100%);max-height:90vh;overflow:auto;padding:20px}.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.modal h2{font-size:20px;margin:0}.close{background:#edf1f6;color:#334}.goal-row{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #edf1f6}.goal-row button{background:#edf2f8;padding:7px 12px}.goal-row .count{font-weight:800;min-width:20px;text-align:center}.save{background:var(--blue);color:white;width:100%;margin-top:16px}.modal p{color:var(--muted);font-size:13px}
-footer{text-align:center;padding:18px;color:#8290a4;font-size:12px}
+.connection{font-size:12px;margin-top:8px}.connection.ok{color:#9fe5bb}.connection.err{color:#ffb4bb}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.side{grid-template-columns:repeat(2,minmax(0,1fr))}.side .panel:last-child{grid-column:1/-1}}
 @media(max-width:600px){header{padding:14px}.layout{padding:0 10px;margin:14px auto;gap:14px}.match-top{grid-template-columns:53px minmax(0,1fr);gap:10px;padding:12px}.datebox b{font-size:20px}.status{grid-column:2;justify-self:start;padding:7px 12px}.players{padding:10px;gap:6px}.player{padding:4px 8px 4px 4px;font-size:11px}.avatar{width:27px;height:27px}.card-foot{padding:0 12px 12px}.side{grid-template-columns:1fr}.side .panel:last-child{grid-column:auto}main h2{font-size:22px}}
 </style>
 </head>
 <body>
-<header><div class="brand"><span class="ball">⚽</span><div><h1>Zaalvoetbal</h1><p>Theater (het)/Drukkerij Krijgsman 35+ 1</p></div></div><button id="resetBtn" title="Herstel de demo">Demo resetten ↺</button></header>
+<header>
+  <div class="brand"><span class="ball">⚽</span><div><h1>Zaalvoetbal</h1><p>Theater (het)/Drukkerij Krijgsman 35+ 1</p><div id="connection" class="connection">Verbinden met teamdatabase…</div></div></div>
+  <button id="refreshBtn" title="Gegevens opnieuw ophalen">↻ Vernieuwen</button>
+</header>
 <div class="layout">
 <main>
-<h2>Seizoensoverzicht</h2><p class="sub">Tik op je naam om je aanwezigheid per wedstrijd te wijzigen. Iedereen kan in deze demo alle namen aanpassen.</p>
+<h2>Seizoensoverzicht</h2><p class="sub">Tik op een naam om aanwezigheid te wijzigen. Wijzigingen worden centraal opgeslagen en automatisch ververst.</p>
 <div class="toolbar"><div class="tabs"><button class="active" id="allTab">Alle wedstrijden</button><button id="openTab">Actie nodig</button></div><select id="filter"><option value="all">Heel seizoen</option><option value="upcoming">Komende wedstrijden</option><option value="played">Gespeeld</option></select></div>
-<div class="match-list" id="matches"></div>
+<div class="match-list" id="matches"><div class="empty">Gegevens laden…</div></div>
 </main>
 <aside class="side">
 <section class="panel"><h3>Seizoensstatus</h3><div class="summary"><div class="sum g"><b id="greenCount">0</b><small>Groen<br>7+ spelers</small></div><div class="sum y"><b id="yellowCount">0</b><small>Twijfel<br>5–6 spelers</small></div><div class="sum r"><b id="redCount">0</b><small>Rood<br>&lt; 5 spelers</small></div></div><div class="progress"><span id="pg" style="background:#16884e"></span><span id="py" style="background:#e8a008"></span><span id="pr" style="background:#d93643"></span></div><div class="legend" id="progressText"></div></section>
 <section class="panel"><h3>🏆 Topscorers</h3><div class="scorers" id="scorers"></div></section>
-<section class="panel"><h3>Doelpunten per speler</h3><div class="chart-wrap" id="chart"></div><div class="chart-note">Cumulatieve doelpunten per gespeelde wedstrijd (demo- en ingevoerde gegevens).</div></section>
+<section class="panel"><h3>Doelpunten per speler</h3><div class="chart-wrap" id="chart"></div><div class="chart-note">Cumulatieve doelpunten per gespeelde wedstrijd.</div></section>
 <section class="panel hint"><h3>💡 Zo werkt het</h3><p>Groen = aanwezig, rood = afwezig, grijs = nog niet ingevuld. Het stoplicht telt alleen spelers die op aanwezig staan. Na een wedstrijd kun je via ‘Doelpunten’ de score per speler invullen.</p></section>
 </aside>
 </div>
-<div class="modal-back" id="modalBack"><div class="modal"><div class="modal-head"><h2 id="modalTitle">Doelpunten invullen</h2><button class="close" id="closeModal">Sluiten ✕</button></div><p>Gebruik + en − om het aantal doelpunten per speler vast te leggen. Opslaan werkt in deze browser.</p><div id="goalRows"></div><button class="save" id="saveGoals">Doelpunten opslaan</button></div></div>
-<footer>Prototype • Demo-gegevens • Opslag op dit apparaat/browser</footer>
+<div class="modal-back" id="modalBack"><div class="modal"><div class="modal-head"><h2 id="modalTitle">Doelpunten invullen</h2><button class="close" id="closeModal">Sluiten ✕</button></div><p>Gebruik + en − om het aantal doelpunten per speler vast te leggen.</p><div id="goalRows"></div><button class="save" id="saveGoals">Doelpunten opslaan</button></div></div>
+<footer>Teamdashboard • Centrale opslag via Supabase</footer>
 <script>
-const players=[
- {id:"marco",name:"Marco Cats",role:"vast"},{id:"bobd",name:"Bob Donkersloot",role:"vast"},{id:"tims",name:"Tim Swaag",role:"vast"},{id:"bobh",name:"Bob Hansen",role:"vast"},{id:"rene",name:"Rene de Koning",role:"vast"},{id:"johan",name:"Johan Haringhuizen",role:"vast"},{id:"frank",name:"Frank van der Linden",role:"vast"},{id:"mike",name:"Mike Wester",role:"vast"},{id:"maikel",name:"Maikel",role:"vast"},
- {id:"elwin",name:"Elwin Buikema",role:"reserve"},{id:"jeroenva",name:"Jeroen van der Aa",role:"reserve"},{id:"giorgio",name:"Giorgio van Tongeren",role:"reserve"},{id:"eloy",name:"Eloy Zuurbier",role:"reserve"},{id:"jurgen",name:"Jurgen Hoepel",role:"reserve"},{id:"david",name:"David",role:"reserve"},{id:"emiel",name:"Emiel de Boer",role:"reserve"},{id:"kuba",name:"Kuba Dmyszewicz",role:"reserve"},{id:"martijnb",name:"Martijn Brandenburg",role:"reserve"}
-];
-const fixtures=[
- ["2026-09-18","Tijd onbekend","Locatie onbekend","Ursem","10–5","gespeeld","home"],
- ["2026-10-02","21:05","Locatie onbekend","ZV Vrone 35+3","","","home"],
- ["2026-10-05","20:05","Locatie onbekend","AFC 34 35+1","","","away"],
- ["2026-10-12","20:00","Locatie onbekend","Indri Vloeren 35+1","","","away"],
- ["2026-10-30","20:00","Locatie onbekend","LZV/Sport 2000 35+2","","","home"],
- ["2026-11-04","19:00","Locatie onbekend","Rijp (de) 35+1","","","away"],
- ["2026-11-11","20:00","Locatie onbekend","HZV 35+1","","","home"],
- ["2026-11-20","20:00","Locatie onbekend","Koedijk 35+2","","","away"],
- ["2026-11-27","19:00","Locatie onbekend","AZC/VELTEN MEN 35+1","","","home"],
- ["2026-12-04","22:00","Locatie onbekend","Indri Vloeren 35+1","","","home"],
- ["2026-12-09","19:00","Locatie onbekend","SVW 27","","","away"]
-];
-const seed={};
-fixtures.forEach((f,i)=>{seed[i]={attendance:{},goals:{}};});
-seed[0].result="10–5";
-const KEY="zaalvoetbal-demo-wedstrijden-v2";let data=load();let selectedMatch=0;let actionOnly=false;
-function load(){try{const d=JSON.parse(localStorage.getItem(KEY));return d&&d.matches?d:{matches:structuredClone(seed)}}catch(e){return {matches:structuredClone(seed)}}}
-function persist(){localStorage.setItem(KEY,JSON.stringify(data))}
+const SUPABASE_URL="https://ksamehchmhctipbldfiw.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzYW1laGNobWhjdGlwYmxkZml3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTc4NzgsImV4cCI6MjEwNjU5Mzg3OH0.0-yeplI8TCGz0mPd5W0E3QWvChRnIoSGwOAf-SpSjsg";
+const API=SUPABASE_URL+"/rest/v1";
+const headers={apikey:SUPABASE_KEY,Authorization:"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"};
+
+let players=[];
+let fixtures=[];
+let data={matches:[]};
+let selectedMatch=0;
+let actionOnly=false;
+
+function setConnection(ok,msg){
+  const el=document.getElementById("connection");
+  el.textContent=msg;
+  el.className="connection "+(ok?"ok":"err");
+}
 function initials(n){return n.split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase()}
-function fmtDate(s){const d=new Date(s+"T12:00:00");return {day:d.toLocaleDateString("nl-NL",{day:"2-digit"}),mon:d.toLocaleDateString("nl-NL",{month:"short"}),full:d.toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}}
+function fmtDate(s){const d=new Date(s+"T12:00:00");return {day:d.toLocaleDateString("nl-NL",{day:"2-digit"}),mon:d.toLocaleDateString("nl-NL",{month:"short"}),full:d.toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long",year:"numeric")}}
+function api(path,options={}){
+  return fetch(API+path,{...options,headers:{...headers,...(options.headers||{})}}).then(async r=>{
+    if(!r.ok){const t=await r.text();throw new Error(r.status+" "+t)}
+    return r.status===204?null:r.json();
+  });
+}
 function statusFor(m){const n=players.filter(p=>m.attendance[p.id]==="yes").length;return {n,cls:n<5?"red":n<7?"yellow":"green",label:n<5?"Onvoldoende":n<7?"Twijfel":"Voldoende"}}
-function render(){const list=document.getElementById("matches");list.innerHTML="";let shown=fixtures.map((f,i)=>({f,i,m:data.matches[i]}));
-const filter=document.getElementById("filter").value; if(filter==="upcoming")shown=shown.filter(x=>x.i>0);if(filter==="played")shown=shown.filter(x=>x.f[5]==="gespeeld"||Object.keys(x.m.goals||{}).length);
-if(actionOnly)shown=shown.filter(x=>statusFor(x.m).n<7);
-shown.forEach(({f,i,m})=>{const d=fmtDate(f[0]),s=statusFor(m);const card=document.createElement("article");card.className="match";
-const playersHtml=players.map(p=>{const a=m.attendance[p.id]||"unset";const cls=a==="yes"?"present":a==="no"?"absent":"unknown";const txt=a==="yes"?"Aanwezig":a==="no"?"Afwezig":"—";return `<button class="player ${cls}" data-match="${i}" data-player="${p.id}" title="Tik om status te wijzigen"><span class="avatar">${initials(p.name)}</span><span>${p.name}</span><span class="state">${a==="yes"?"✓":a==="no"?"✕":"·"}</span></button>`}).join("");
-card.innerHTML=`<div class="match-top"><div class="datebox"><small>${d.mon}</small><b>${d.day}</b><small>${d.full.split(" ")[0]}</small></div><div class="match-info"><div class="when">${d.full} · ${f[1]}</div><div class="where">📍 ${f[2]}</div><div class="versus">${f[6]==="away"?`<strong>${f[3]}</strong> — Theater (het)/Drukkerij Krijgsman 35+ 1`:`Theater (het)/Drukkerij Krijgsman 35+ 1 <strong>— ${f[3]}</strong>`}${f[4]?` <strong class="result"> · Uitslag ${f[4]}</strong>`:""}</div></div><div class="status ${s.cls}">${s.n} / ${players.length}<small>${s.label}</small></div></div><div class="players">${playersHtml}</div><div class="card-foot"><span>Vaste spelers + reserves · Tik op je naam om te wisselen</span><button class="goal-btn" data-goals="${i}">⚽ Doelpunten</button></div>`;
-list.appendChild(card);
-});
-if(!shown.length)list.innerHTML='<div class="empty">Geen wedstrijden in deze selectie.</div>';
-document.querySelectorAll("[data-player]").forEach(b=>b.addEventListener("click",()=>toggle(+b.dataset.match,b.dataset.player)));
-document.querySelectorAll("[data-goals]").forEach(b=>b.addEventListener("click",()=>openGoals(+b.dataset.goals)));
-renderSide();
+
+async function loadAll(){
+  setConnection(false,"Gegevens ophalen…");
+  const [ps,ms,ats,gs]=await Promise.all([
+    api("/players?select=id,name,is_fixed,sort_order&order=sort_order"),
+    api("/matches?select=id,match_date,opponent,home,match_time,goals_for,goals_against&order=match_date"),
+    api("/attendance?select=match_id,player_id,status"),
+    api("/goals?select=match_id,player_id,goal_count")
+  ]);
+  players=ps.map(p=>({id:p.id,name:p.name,role:p.is_fixed?"vast":"reserve"}));
+  fixtures=ms.map(m=>({
+    id:m.id,date:m.match_date,time:m.match_time?String(m.match_time).slice(0,5):"Tijd onbekend",
+    opponent:m.opponent,home:m.home,goals_for:m.goals_for,goals_against:m.goals_against
+  }));
+  data.matches=fixtures.map(()=>({attendance:{},goals:{}}));
+  ats.forEach(a=>{
+    const i=fixtures.findIndex(f=>f.id===a.match_id);
+    if(i>=0)data.matches[i].attendance[a.player_id]=a.status==="present"?"yes":"no";
+  });
+  gs.forEach(g=>{
+    const i=fixtures.findIndex(f=>f.id===g.match_id);
+    if(i>=0)data.matches[i].goals[g.player_id]=Number(g.goal_count||0);
+  });
+  setConnection(true,"● Verbonden met teamdatabase");
+  render();
 }
-function toggle(i,id){const m=data.matches[i];const cur=m.attendance[id]||"unset";m.attendance[id]=cur==="unset"?"yes":cur==="yes"?"no":"unset";persist();render()}
-function renderSide(){let counts={green:0,yellow:0,red:0};fixtures.forEach((f,i)=>counts[statusFor(data.matches[i]).cls]++);["green","yellow","red"].forEach(c=>document.getElementById(c+"Count").textContent=counts[c]);const total=fixtures.length;["g","y","r"].forEach((x,j)=>document.getElementById("p"+x).style.width=(counts[["green","yellow","red"][j]]/total*100)+"%");document.getElementById("progressText").textContent=`${counts.green} groen · ${counts.yellow} twijfel · ${counts.red} rood van ${total} wedstrijden`;
-const totals=players.map(p=>({p,n:fixtures.reduce((sum,f,i)=>sum+Number(data.matches[i].goals?.[p.id]||0),0)})).sort((a,b)=>b.n-a.n);
-document.getElementById("scorers").innerHTML=totals.filter(x=>x.n>0).map((x,i)=>`<div class="scorer"><span>${i+1}</span><span class="avatar">${initials(x.p.name)}</span><span>${x.p.name}</span><b>${x.n}</b></div>`).join("")||'<div class="legend">Nog geen doelpunten ingevoerd.</div>';
-drawChart(totals.slice(0,5).filter(x=>x.n>0));
+
+function render(){
+  const list=document.getElementById("matches");list.innerHTML="";
+  let shown=fixtures.map((f,i)=>({f,i,m:data.matches[i]}));
+  const filter=document.getElementById("filter").value;
+  const today=new Date().toISOString().slice(0,10);
+  if(filter==="upcoming")shown=shown.filter(x=>x.f.date>=today);
+  if(filter==="played")shown=shown.filter(x=>x.f.date<today || x.f.goals_for!==null || Object.keys(x.m.goals||{}).length);
+  if(actionOnly)shown=shown.filter(x=>statusFor(x.m).n<7);
+  shown.forEach(({f,i,m})=>{
+    const d=fmtDate(f.date),s=statusFor(m);
+    const card=document.createElement("article");card.className="match";
+    const playersHtml=players.map(p=>{
+      const a=m.attendance[p.id]||"unset";
+      const cls=a==="yes"?"present":a==="no"?"absent":"unknown";
+      return `<button class="player ${cls}" data-match="${i}" data-player="${p.id}" title="Tik om status te wijzigen"><span class="avatar">${initials(p.name)}</span><span>${p.name}</span><span class="state">${a==="yes"?"✓":a==="no"?"✕":"·"}</span></button>`
+    }).join("");
+    let result="";
+    if(f.goals_for!==null && f.goals_for!==undefined && f.goals_against!==null && f.goals_against!==undefined)
+      result=` <strong class="result"> · Uitslag ${f.goals_for}–${f.goals_against}</strong>`;
+    card.innerHTML=`<div class="match-top"><div class="datebox"><small>${d.mon}</small><b>${d.day}</b><small>${d.full.split(" ")[0]}</small></div><div class="match-info"><div class="when">${d.full} · ${f.time}</div><div class="where">📍 Locatie via teamplanning</div><div class="versus">${f.home?`Theater (het)/Drukkerij Krijgsman 35+ 1 <strong>— ${f.opponent}</strong>`:`<strong>${f.opponent}</strong> — Theater (het)/Drukkerij Krijgsman 35+ 1`}${result}</div></div><div class="status ${s.cls}">${s.n} / ${players.length}<small>${s.label}</small></div></div><div class="players">${playersHtml}</div><div class="card-foot"><span>Vaste spelers + reserves · Tik op een naam om te wisselen</span><button class="goal-btn" data-goals="${i}">⚽ Doelpunten</button></div>`;
+    list.appendChild(card);
+  });
+  if(!shown.length)list.innerHTML='<div class="empty">Geen wedstrijden in deze selectie.</div>';
+  document.querySelectorAll("[data-player]").forEach(b=>b.addEventListener("click",()=>toggle(+b.dataset.match,b.dataset.player)));
+  document.querySelectorAll("[data-goals]").forEach(b=>b.addEventListener("click",()=>openGoals(+b.dataset.goals)));
+  renderSide();
 }
-function drawChart(top){const box=document.getElementById("chart");if(!top.length){box.innerHTML='<p class="chart-note">Na invoer van doelpunten verschijnt hier de grafiek.</p>';return}
-const W=270,H=185,L=28,R=8,T=12,B=24,plotW=W-L-R,plotH=H-T-B,max=Math.max(5,...top.map(x=>x.n));let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Doelpunten grafiek">`;
-for(let k=0;k<=4;k++){let y=T+plotH*k/4,val=Math.round(max*(1-k/4));s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#e7edf5"/><text x="${L-6}" y="${y+4}" text-anchor="end" font-size="10" fill="#718096">${val}</text>`}
-const colors=["#1765d1","#f07824","#16884e","#8b5cf6","#0e9aa7"];
-top.forEach((x,j)=>{let points=[];for(let k=0;k<fixtures.length;k++){let cum=0;for(let q=0;q<=k;q++)cum+=Number(data.matches[q].goals?.[x.p.id]||0);points.push(`${L+plotW*k/Math.max(1,fixtures.length-1)},${T+plotH-(cum/max*plotH)}`)}s+=`<polyline points="${points.join(" ")}" fill="none" stroke="${colors[j]}" stroke-width="2.5" stroke-linejoin="round"/>`;});
-s+=`<text x="${L}" y="${H-5}" font-size="10" fill="#718096">Start seizoen</text><text x="${W-R}" y="${H-5}" text-anchor="end" font-size="10" fill="#718096">Nu</text></svg>`;
-box.innerHTML=s+`<div class="chart-note" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:5px">${top.map((x,i)=>`<span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${colors[i]}"></i> ${x.p.name.split(" ")[0]}</span>`).join("")}</div>`;
+
+async function toggle(i,id){
+  const m=data.matches[i],matchId=fixtures[i].id;
+  const cur=m.attendance[id]||"unset";
+  const next=cur==="unset"?"yes":cur==="yes"?"no":"unset";
+  try{
+    if(next==="unset"){
+      await api(`/attendance?match_id=eq.${encodeURIComponent(matchId)}&player_id=eq.${encodeURIComponent(id)}`,{method:"DELETE"});
+      delete m.attendance[id];
+    }else{
+      await api("/attendance?on_conflict=match_id,player_id",{method:"POST",headers:{"Prefer":"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({match_id:matchId,player_id:id,status:next==="yes"?"present":"absent"})});
+      m.attendance[id]=next;
+    }
+    render();
+  }catch(e){console.error(e);alert("Opslaan van aanwezigheid mislukt. Controleer de Supabase-instellingen.");}
 }
-function openGoals(i){selectedMatch=i;const f=fixtures[i],d=fmtDate(f[0]);document.getElementById("modalTitle").textContent=`Doelpunten · ${d.day} ${d.mon}`;const m=data.matches[i];document.getElementById("goalRows").innerHTML=players.map(p=>`<div class="goal-row"><span>${p.name}</span><button data-minus="${p.id}">−</button><span class="count" id="g-${p.id}">${Number(m.goals[p.id]||0)}</span><button data-plus="${p.id}">+</button></div>`).join("");document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>changeGoal(b.dataset.minus,-1));document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>changeGoal(b.dataset.plus,1));document.getElementById("modalBack").classList.add("open")}
+
+function renderSide(){
+  let counts={green:0,yellow:0,red:0};
+  fixtures.forEach((f,i)=>counts[statusFor(data.matches[i]).cls]++);
+  ["green","yellow","red"].forEach(c=>document.getElementById(c+"Count").textContent=counts[c]);
+  const total=fixtures.length||1;
+  ["g","y","r"].forEach((x,j)=>document.getElementById("p"+x).style.width=(counts[["green","yellow","red"][j]]/total*100)+"%");
+  document.getElementById("progressText").textContent=`${counts.green} groen · ${counts.yellow} twijfel · ${counts.red} rood van ${fixtures.length} wedstrijden`;
+  const totals=players.map(p=>({p,n:fixtures.reduce((sum,f,i)=>sum+Number(data.matches[i].goals?.[p.id]||0),0)})).sort((a,b)=>b.n-a.n);
+  document.getElementById("scorers").innerHTML=totals.filter(x=>x.n>0).map((x,i)=>`<div class="scorer"><span>${i+1}</span><span class="avatar">${initials(x.p.name)}</span><span>${x.p.name}</span><b>${x.n}</b></div>`).join("")||'<div class="legend">Nog geen doelpunten ingevoerd.</div>';
+  drawChart(totals.slice(0,5).filter(x=>x.n>0));
+}
+
+function drawChart(top){
+  const box=document.getElementById("chart");
+  if(!top.length){box.innerHTML='<p class="chart-note">Na invoer van doelpunten verschijnt hier de grafiek.</p>';return}
+  const W=270,H=185,L=28,R=8,T=12,B=24,plotW=W-L-R,plotH=H-T-B,max=Math.max(5,...top.map(x=>x.n));
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Doelpunten grafiek">`;
+  for(let k=0;k<=4;k++){let y=T+plotH*k/4,val=Math.round(max*(1-k/4));s+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#e7edf5"/><text x="${L-6}" y="${y+4}" text-anchor="end" font-size="10" fill="#718096">${val}</text>`}
+  const colors=["#1765d1","#f07824","#16884e","#8b5cf6","#0e9aa7"];
+  top.forEach((x,j)=>{let points=[];for(let k=0;k<fixtures.length;k++){let cum=0;for(let q=0;q<=k;q++)cum+=Number(data.matches[q].goals?.[x.p.id]||0);points.push(`${L+plotW*k/Math.max(1,fixtures.length-1)},${T+plotH-(cum/max*plotH)}`)}s+=`<polyline points="${points.join(" ")}" fill="none" stroke="${colors[j]}" stroke-width="2.5" stroke-linejoin="round"/>`});
+  s+=`<text x="${L}" y="${H-5}" font-size="10" fill="#718096">Start seizoen</text><text x="${W-R}" y="${H-5}" text-anchor="end" font-size="10" fill="#718096">Nu</text></svg>`;
+  box.innerHTML=s+`<div class="chart-note" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:5px">${top.map((x,i)=>`<span><i style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${colors[i]}"></i> ${x.p.name.split(" ")[0]}</span>`).join("")}</div>`;
+}
+
+function openGoals(i){
+  selectedMatch=i;const f=fixtures[i],d=fmtDate(f.date);
+  document.getElementById("modalTitle").textContent=`Doelpunten · ${d.day} ${d.mon}`;
+  const m=data.matches[i];
+  document.getElementById("goalRows").innerHTML=players.map(p=>`<div class="goal-row"><span>${p.name}</span><button data-minus="${p.id}">−</button><span class="count" id="g-${p.id}">${Number(m.goals[p.id]||0)}</span><button data-plus="${p.id}">+</button></div>`).join("");
+  document.querySelectorAll("[data-minus]").forEach(b=>b.onclick=()=>changeGoal(b.dataset.minus,-1));
+  document.querySelectorAll("[data-plus]").forEach(b=>b.onclick=()=>changeGoal(b.dataset.plus,1));
+  document.getElementById("modalBack").classList.add("open");
+}
 function changeGoal(id,delta){const el=document.getElementById("g-"+id);el.textContent=Math.max(0,Number(el.textContent)+delta)}
-document.getElementById("saveGoals").onclick=()=>{const m=data.matches[selectedMatch];players.forEach(p=>{const n=Number(document.getElementById("g-"+p.id).textContent);if(n)m.goals[p.id]=n;else delete m.goals[p.id]});persist();document.getElementById("modalBack").classList.remove("open");render()};
+document.getElementById("saveGoals").onclick=async()=>{
+  const m=data.matches[selectedMatch],matchId=fixtures[selectedMatch].id;
+  try{
+    for(const p of players){
+      const n=Number(document.getElementById("g-"+p.id).textContent);
+      await api("/goals?on_conflict=match_id,player_id",{method:"POST",headers:{"Prefer":"resolution=merge-duplicates,return=minimal"},body:JSON.stringify({match_id:matchId,player_id:p.id,goal_count:n})});
+      m.goals[p.id]=n;
+    }
+    document.getElementById("modalBack").classList.remove("open");render();
+  }catch(e){console.error(e);alert("Doelpunten opslaan mislukt. Controleer de Supabase-instellingen.");}
+};
 document.getElementById("closeModal").onclick=()=>document.getElementById("modalBack").classList.remove("open");
 document.getElementById("modalBack").onclick=e=>{if(e.target.id==="modalBack")e.currentTarget.classList.remove("open")};
 document.getElementById("allTab").onclick=()=>{actionOnly=false;document.getElementById("allTab").classList.add("active");document.getElementById("openTab").classList.remove("active");render()};
 document.getElementById("openTab").onclick=()=>{actionOnly=true;document.getElementById("openTab").classList.add("active");document.getElementById("allTab").classList.remove("active");render()};
 document.getElementById("filter").onchange=render;
-document.getElementById("resetBtn").onclick=()=>{if(confirm("Alle demo-aanpassingen wissen en de voorbeeldgegevens herstellen?")){data={matches:structuredClone(seed)};persist();render()}};
-render();
+document.getElementById("refreshBtn").onclick=loadAll;
+
+loadAll().catch(e=>{console.error(e);setConnection(false,"● Verbinding mislukt");document.getElementById("matches").innerHTML='<div class="empty">De teamdatabase kon niet worden geladen. Controleer de Supabase-koppeling.</div>'});
+setInterval(()=>loadAll().catch(e=>console.error(e)),5000);
 </script>
-</body></html>
+</body>
+</html>
