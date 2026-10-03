@@ -80,7 +80,7 @@ function setConnection(ok,msg){
   el.className="connection "+(ok?"ok":"err");
 }
 function initials(n){return n.split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase()}
-function fmtDate(s){const d=new Date(s+"T12:00:00");return {day:d.toLocaleDateString("nl-NL",{day:"2-digit"}),mon:d.toLocaleDateString("nl-NL",{month:"short"}),full:d.toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long",year:"numeric")}}
+function fmtDate(s){const d=new Date(s+"T12:00:00");return {day:d.toLocaleDateString("nl-NL",{day:"2-digit"}),mon:d.toLocaleDateString("nl-NL",{month:"short"}),full:d.toLocaleDateString("nl-NL",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}}
 function api(path,options={}){
   return fetch(API+path,{...options,headers:{...headers,...(options.headers||{})}}).then(async r=>{
     if(!r.ok){const t=await r.text();throw new Error(r.status+" "+t)}
