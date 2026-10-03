@@ -1,40 +1,593 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#10233f">
-<title>Zaalvoetbal — teamdashboard</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⚽ Zaalvoetbal</title>
 <style>
-:root{--navy:#10233f;--blue:#1765d1;--green:#12834a;--red:#d92d3a;--yellow:#e8a008;--ink:#172b4d;--muted:#64748b;--line:#dce5ef;--bg:#f3f6fb}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:var(--ink)}
-header{background:var(--navy);color:white;padding:18px max(18px,calc((100% - 1440px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px}
-.brand{display:flex;align-items:center;gap:12px}.ball{font-size:34px}.brand h1{font-size:20px;margin:0}.brand p{margin:2px 0 0;color:#d5e2f4;font-size:13px}
-button,select,input{font:inherit}button{cursor:pointer;border:0;border-radius:10px;padding:10px 14px;font-weight:650}
-header button{background:#23436c;color:#fff;border:1px solid #466386}
-.layout{max-width:1440px;margin:22px auto;padding:0 18px;display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:20px}
-main h2{margin:0 0 5px;font-size:24px}.sub{margin:0 0 18px;color:var(--muted)}
-.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}.tabs{display:flex;gap:6px;background:#e7edf6;border-radius:12px;padding:4px}.tabs button{background:transparent;color:#51627a}.tabs button.active{background:white;color:var(--blue);box-shadow:0 1px 4px #15294c18}
-select{border:1px solid var(--line);border-radius:9px;background:white;padding:9px;color:var(--ink)}
-.match-list{display:grid;gap:13px}.match{background:white;border:1px solid var(--line);border-radius:15px;box-shadow:0 2px 8px #10233f08;overflow:hidden}
-.match-top{padding:15px 16px 12px;display:grid;grid-template-columns:65px minmax(0,1fr) auto;gap:13px;align-items:center}
-.datebox{background:#eaf1ff;color:#174b9d;border-radius:11px;text-align:center;padding:8px 4px;font-weight:750;line-height:1.2}.datebox b{display:block;font-size:23px}.datebox small{font-size:12px;text-transform:uppercase}
-.match-info .when{font-weight:750;font-size:16px}.match-info .where,.match-info .versus{font-size:13px;color:var(--muted);margin-top:3px}.versus strong{color:var(--ink)}
-.result{color:#0b7540}.status{border-radius:12px;padding:10px 13px;min-width:106px;text-align:center;font-weight:750;white-space:nowrap}.status small{display:block;font-weight:600;font-size:11px}.status.green{background:#e2f6e9;color:#08783d}.status.yellow{background:#fff3d3;color:#946200}.status.red{background:#fde6e8;color:#b42332}.status.gray{background:#edf1f6;color:#68768a}
-.players{border-top:1px solid #edf1f6;padding:12px 14px 14px;display:flex;flex-wrap:wrap;gap:8px}
-.player{display:flex;align-items:center;gap:7px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 10px 6px 6px;color:#34445c;font-size:12px;transition:.12s}
-.avatar{width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:#e7edf5;color:#52647d;font-size:11px;font-weight:800}
-.player.present{background:#e5f7eb;border-color:#b9e6c8;color:#086b37}.player.present .avatar{background:#16884e;color:white}
-.player.absent{background:#fde9ea;border-color:#f5c0c4;color:#ad2430}.player.absent .avatar{background:#d93643;color:white}
-.player.unknown{background:#f8fafc;border-style:dashed;color:#6b778a}
-.player .state{font-weight:800;font-size:11px}
-.card-foot{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:0 16px 13px;color:var(--muted);font-size:12px}
-.goal-btn{background:#eef4ff;color:#1857ad;padding:8px 12px}
-.side{display:grid;gap:14px;align-content:start}.panel{background:#fff;border:1px solid var(--line);border-radius:15px;padding:17px;box-shadow:0 2px 8px #10233f08}.panel h3{margin:0 0 13px;font-size:16px}
-.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.sum{padding:12px 5px;border-radius:11px;text-align:center}.sum b{font-size:25px;display:block}.sum small{font-size:11px}.sum.g{background:#e4f6eb;color:#08783d}.sum.y{background:#fff4d7;color:#946200}.sum.r{background:#fde8e9;color:#b42332}
-.progress{height:9px;border-radius:20px;overflow:hidden;display:flex;background:#edf1f6;margin:14px 0 8px}.progress span{height:100%}.legend{font-size:12px;color:var(--muted)}
-.scorers{display:grid;gap:10px}.scorer{display:grid;grid-template-columns:23px 32px 1fr auto;gap:8px;align-items:center;border-bottom:1px solid #edf1f6;padding-bottom:9px;font-size:13px}.scorer:last-child{border:0;padding-bottom:0}.scorer .avatar{background:#18385e;color:#fff}.scorer b{font-size:15px}
-.chart-wrap{height:200px}.chart-wrap svg{width:100%;height:100%;overflow:visible}.chart-note{font-size:12px;color:var(--muted)}
-.hint{background:#edf8f1;border-color:#cbead6}.hint p{font-size:13px;color:#375b45;margin:0}
+:root{--bg:#f4f6f8;--card:#fff;--text:#18212b;--muted:#6b7785;--line:#e2e7ec;--green:#1d9a63;--red:#d9534f;--orange:#e99a24;--blue:#2f6fed;--shadow:0 4px 18px rgba(20,35,50,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}button{font:inherit}header{background:#17212b;color:#fff;padding:22px 18px 18px}header h1{margin:0;font-size:24px}header .team{margin-top:5px;font-size:14px;color:#c8d1da}.connection{margin-top:12px;font-size:12px;color:#ffd166}.connection.ok{color:#7be0ad}.wrap{max-width:1050px;margin:0 auto;padding:16px}.tabs{display:flex;gap:8px;margin-bottom:12px}.tab,.filter button,.refresh{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 13px;cursor:pointer;color:var(--text)}.tab.active,.filter button.active{background:#17212b;color:#fff;border-color:#17212b}.refresh{margin-left:auto}.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:15px}.filter{display:flex;gap:6px;flex-wrap:wrap}.section-title{font-size:14px;font-weight:700;color:var(--muted);margin:18px 0 8px}.cards{display:grid;gap:12px}.match-card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.match-top{display:flex;justify-content:space-between;gap:12px;padding:15px 16px 10px}.date{font-size:12px;color:var(--muted);text-transform:capitalize}.versus{font-weight:700;margin-top:4px}.result{font-size:13px;margin-top:5px;color:var(--muted)}.status{font-size:11px;font-weight:700;border-radius:999px;padding:5px 8px;height:max-content}.status.green{background:#e4f6ed;color:#147448}.status.red{background:#fde9e8;color:#a92e2a}.status.orange{background:#fff1dc;color:#9a610d}.players{display:flex;flex-wrap:wrap;gap:7px;padding:8px 16px 15px}.pill{border:1px solid var(--line);background:#f7f9fb;border-radius:999px;padding:7px 10px;cursor:pointer;font-size:12px}.pill.yes{background:#e5f7ee;border-color:#a8dfc4;color:#116b43}.pill.no{background:#fdeaea;border-color:#efb7b5;color:#a52e2a;text-decoration:line-through}.pill.unset{color:#596674}.actions{border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:8px}.action-btn{border:0;background:#edf2f7;border-radius:9px;padding:8px 11px;cursor:pointer}.empty{background:#fff;border:1px dashed #cfd7df;border-radius:14px;padding:25px;text-align:center;color:var(--muted)}.side-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}.panel h3{margin:0 0 12px;font-size:16px}.scorer{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)}.scorer:last-child{border-bottom:0}.count{font-weight:800}.chart-wrap{overflow:auto}.chart{width:100%;min-width:460px;height:230px}.modal-back{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modal-back.open{display:flex}.modal{background:#fff;border-radius:18px;max-width:520px;width:100%;max-height:85vh;overflow:auto;padding:18px}.modal h2{margin:0 0 4px}.modal-sub{color:var(--muted);font-size:13px;margin-bottom:12px}.goal-row{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:9px 0}.goal-controls{display:flex;align-items:center;gap:9px}.goal-controls button{width:32px;height:32px;border:0;border-radius:8px;background:#edf2f7;cursor:pointer;font-size:18px}.goal-num{min-width:22px;text-align:center;font-weight:800}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px}.modal-actions button{border:0;border-radius:9px;padding:9px 13px;cursor:pointer}.cancel{background:#edf2f7}.save{background:#17212b;color:#fff}@media(max-width:700px){.side-grid{grid-template-columns:1fr}.match-top{align-items:flex-start}.refresh{margin-left:0}}
+</style>
+</head>
+<body>
+<header>
+  <h1>⚽ Zaalvoetbal</h1>
+  <div class="team">Theater (het)/Drukkerij Krijgsman 35+ 1</div>
+  <div id="connection" class="connection">Verbinden met teamdatabase…</div>
+</header>
+
+<main class="wrap">
+  <div class="toolbar">
+    <div class="tabs">
+      <button id="tabAll" class="tab active">Alle wedstrijden</button>
+      <button id="tabAction" class="tab">Actie nodig</button>
+    </div>
+    <button id="refresh" class="refresh">↻ Vernieuwen</button>
+  </div>
+
+  <div class="toolbar">
+    <div class="filter">
+      <button data-filter="all" class="active">Heel seizoen</button>
+      <button data-filter="upcoming">Komende wedstrijden</button>
+      <button data-filter="played">Gespeeld</button>
+    </div>
+  </div>
+
+  <div id="matches" class="cards"></div>
+
+  <div class="side-grid">
+    <section class="panel">
+      <h3>Seizoensstatus</h3>
+      <div id="seasonStatus"></div>
+    </section>
+    <section class="panel">
+      <h3>Topscorers</h3>
+      <div id="scorers"></div>
+    </section>
+  </div>
+
+  <section class="panel" style="margin-top:14px">
+    <h3>Doelpuntenverloop</h3>
+    <div id="chart" class="chart-wrap"></div>
+  </section>
+</main>
+
+<div id="modalBack" class="modal-back">
+  <div class="modal">
+    <h2>Doelpunten invoeren</h2>
+    <div id="modalSub" class="modal-sub"></div>
+    <div id="goalRows"></div>
+    <div class="modal-actions">
+      <button id="cancelGoals" class="cancel">Annuleren</button>
+      <button id="saveGoals" class="save">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const SUPABASE_URL = "https://ksamehchmhctipbldfiw.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtzYW1laGNobWhjdGlwYmxkZml2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwMTc4NzgsImV4cCI6MjEwNjU5Mzg3OH0.0-yeplI8TCGz0mPd5W0E3QWvChRnIoSGwOAf-SpSjsg";
+const API = SUPABASE_URL + "/rest/v1";
+
+const headers = {
+  apikey: SUPABASE_KEY,
+  Authorization: "Bearer " + SUPABASE_KEY,
+  "Content-Type": "application/json"
+};
+
+let players = [];
+let fixtures = [];
+let data = { matches: [] };
+let currentTab = "all";
+let currentFilter = "all";
+let selectedMatch = null;
+let refreshing = false;
+
+const connectionEl = document.getElementById("connection");
+const matchesEl = document.getElementById("matches");
+const seasonStatusEl = document.getElementById("seasonStatus");
+const scorersEl = document.getElementById("scorers");
+const chartEl = document.getElementById("chart");
+const modalBack = document.getElementById("modalBack");
+const goalRows = document.getElementById("goalRows");
+const modalSub = document.getElementById("modalSub");
+
+function setConnection(ok, text) {
+  connectionEl.textContent = text;
+  connectionEl.className = "connection" + (ok ? " ok" : "");
+}
+
+async function api(path, options = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(function () {
+    controller.abort();
+  }, 10000);
+
+  try {
+    const response = await fetch(API + path, {
+      ...options,
+      headers: { ...headers, ...(options.headers || {}) },
+      signal: controller.signal
+    });
+
+    const text = await response.text();
+    let body = null;
+    if (text) {
+      try {
+        body = JSON.parse(text);
+      } catch (e) {
+        body = text;
+      }
+    }
+
+    if (!response.ok) {
+      const message = body && body.message ? body.message : String(body || response.statusText);
+      throw new Error(response.status + " " + message);
+    }
+
+    return body;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function fmtDate(value) {
+  const d = new Date(value + "T12:00:00");
+  return {
+    day: d.toLocaleDateString("nl-NL", { day: "2-digit" }),
+    mon: d.toLocaleDateString("nl-NL", { month: "short" }),
+    full: d.toLocaleDateString("nl-NL", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    })
+  };
+}
+
+function fmtTime(value) {
+  if (!value) return "";
+  return String(value).slice(0, 5);
+}
+
+function todayString() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return y + "-" + m + "-" + d;
+}
+
+function matchIsPlayed(match) {
+  return match.goals_for !== null && match.goals_for !== undefined &&
+         match.goals_against !== null && match.goals_against !== undefined;
+}
+
+function attendanceSummary(match) {
+  let present = 0;
+  let absent = 0;
+  for (const player of players) {
+    const status = match.attendance[player.id];
+    if (status === "yes") present++;
+    if (status === "no") absent++;
+  }
+  return { present, absent };
+}
+
+function statusForMatch(match) {
+  const summary = attendanceSummary(match);
+  if (matchIsPlayed(match)) return { cls: "green", text: "Gespeeld" };
+  if (summary.present > 0) return { cls: "green", text: summary.present + " aanwezig" };
+  if (summary.absent > 0) return { cls: "orange", text: summary.absent + " afwezig" };
+  return { cls: "red", text: "Actie nodig" };
+}
+
+function buildMatchText(fixture) {
+  const team = "Theater (het)/Drukkerij Krijgsman 35+ 1";
+  if (fixture.home) {
+    return team + " <strong>— " + fixture.opponent + "</strong>";
+  }
+  return "<strong>" + fixture.opponent + "</strong> — " + team;
+}
+
+function render() {
+  renderMatches();
+  renderSide();
+}
+
+function renderMatches() {
+  const today = todayString();
+  const visible = [];
+
+  for (let i = 0; i < fixtures.length; i++) {
+    const fixture = fixtures[i];
+    const match = data.matches[i];
+    const played = matchIsPlayed(fixture);
+    const upcoming = fixture.match_date >= today && !played;
+    const action = !played && attendanceSummary(match).present === 0 && attendanceSummary(match).absent === 0;
+
+    if (currentFilter === "upcoming" && !upcoming) continue;
+    if (currentFilter === "played" && !played) continue;
+    if (currentTab === "action" && !action) continue;
+
+    visible.push({ fixture, match, index: i });
+  }
+
+  if (!visible.length) {
+    matchesEl.innerHTML = '<div class="empty">Geen wedstrijden gevonden voor deze selectie.</div>';
+    return;
+  }
+
+  matchesEl.innerHTML = "";
+
+  for (const item of visible) {
+    const fixture = item.fixture;
+    const match = item.match;
+    const index = item.index;
+    const date = fmtDate(fixture.match_date);
+    const status = statusForMatch(match);
+    const result = matchIsPlayed(fixture)
+      ? '<div class="result">Uitslag: <strong>' + fixture.goals_for + " - " + fixture.goals_against + "</strong></div>"
+      : "";
+
+    const card = document.createElement("article");
+    card.className = "match-card";
+
+    let playersHtml = "";
+    for (const player of players) {
+      const state = match.attendance[player.id] || "unset";
+      const label = state === "yes" ? "✓ " + player.name : state === "no" ? "✕ " + player.name : player.name;
+      playersHtml += '<button class="pill ' + state + '" data-player="' + player.id + '">' + label + "</button>";
+    }
+
+    card.innerHTML =
+      '<div class="match-top">' +
+        '<div>' +
+          '<div class="date">' + date.full + (fixture.match_time ? " · " + fmtTime(fixture.match_time) : "") + '</div>' +
+          '<div class="versus">' + buildMatchText(fixture) + '</div>' +
+          result +
+        '</div>' +
+        '<div class="status ' + status.cls + '">' + status.text + '</div>' +
+      '</div>' +
+      '<div class="players">' + playersHtml + '</div>' +
+      '<div class="actions">' +
+        '<button class="action-btn goals-btn">⚽ Doelpunten</button>' +
+      '</div>';
+
+    card.querySelectorAll(".pill").forEach(function (button) {
+      button.addEventListener("click", function () {
+        toggleAttendance(index, button.dataset.player);
+      });
+    });
+
+    card.querySelector(".goals-btn").addEventListener("click", function () {
+      openGoals(index);
+    });
+
+    matchesEl.appendChild(card);
+  }
+}
+
+async function toggleAttendance(index, playerId) {
+  const fixture = fixtures[index];
+  const match = data.matches[index];
+  const current = match.attendance[playerId] || "unset";
+  const next = current === "unset" ? "yes" : current === "yes" ? "no" : "unset";
+
+  try {
+    if (next === "unset") {
+      await api(
+        "/attendance?match_id=eq." + encodeURIComponent(fixture.id) +
+        "&player_id=eq." + encodeURIComponent(playerId),
+        { method: "DELETE" }
+      );
+      delete match.attendance[playerId];
+    } else {
+      await api("/attendance?on_conflict=match_id,player_id", {
+        method: "POST",
+        headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify({
+          match_id: fixture.id,
+          player_id: playerId,
+          status: next === "yes" ? "present" : "absent"
+        })
+      });
+      match.attendance[playerId] = next;
+    }
+    render();
+  } catch (error) {
+    console.error(error);
+    alert("Opslaan van aanwezigheid mislukt. Controleer de Supabase-instellingen.");
+  }
+}
+
+function openGoals(index) {
+  selectedMatch = index;
+  const fixture = fixtures[index];
+  const match = data.matches[index];
+
+  modalSub.textContent = fmtDate(fixture.match_date).full + " · " +
+    (fixture.home ? "Theater (het)" : fixture.opponent) + " - " +
+    (fixture.home ? fixture.opponent : "Theater (het)");
+
+  goalRows.innerHTML = "";
+
+  for (const player of players) {
+    const row = document.createElement("div");
+    row.className = "goal-row";
+    const value = Number(match.goals[player.id] || 0);
+    row.innerHTML =
+      '<span>' + player.name + '</span>' +
+      '<div class="goal-controls">' +
+        '<button class="minus">−</button>' +
+        '<span class="goal-num" id="g-' + player.id + '">' + value + '</span>' +
+        '<button class="plus">+</button>' +
+      '</div>';
+
+    row.querySelector(".minus").addEventListener("click", function () {
+      const el = row.querySelector(".goal-num");
+      el.textContent = Math.max(0, Number(el.textContent) - 1);
+    });
+
+    row.querySelector(".plus").addEventListener("click", function () {
+      const el = row.querySelector(".goal-num");
+      el.textContent = Number(el.textContent) + 1;
+    });
+
+    goalRows.appendChild(row);
+  }
+
+  modalBack.classList.add("open");
+}
+
+document.getElementById("cancelGoals").addEventListener("click", function () {
+  modalBack.classList.remove("open");
+  selectedMatch = null;
+});
+
+document.getElementById("saveGoals").addEventListener("click", async function () {
+  if (selectedMatch === null) return;
+
+  const index = selectedMatch;
+  const fixture = fixtures[index];
+  const match = data.matches[index];
+
+  try {
+    for (const player of players) {
+      const el = document.getElementById("g-" + player.id);
+      const count = Number(el ? el.textContent : 0);
+      await api("/goals?on_conflict=match_id,player_id", {
+        method: "POST",
+        headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+        body: JSON.stringify({
+          match_id: fixture.id,
+          player_id: player.id,
+          goal_count: count
+        })
+      });
+      match.goals[player.id] = count;
+    }
+
+    modalBack.classList.remove("open");
+    selectedMatch = null;
+    render();
+  } catch (error) {
+    console.error(error);
+    alert("Doelpunten opslaan mislukt. Controleer de Supabase-instellingen.");
+  }
+});
+
+modalBack.addEventListener("click", function (event) {
+  if (event.target === modalBack) {
+    modalBack.classList.remove("open");
+    selectedMatch = null;
+  }
+});
+
+function renderSide() {
+  let totalPresent = 0;
+  let totalAbsent = 0;
+  let played = 0;
+  let upcoming = 0;
+
+  for (const match of data.matches) {
+    const summary = attendanceSummary(match);
+    totalPresent += summary.present;
+    totalAbsent += summary.absent;
+    if (matchIsPlayed(match)) played++;
+    else upcoming++;
+  }
+
+  seasonStatusEl.innerHTML =
+    '<div class="scorer"><span>Wedstrijden gespeeld</span><span class="count">' + played + '</span></div>' +
+    '<div class="scorer"><span>Komende wedstrijden</span><span class="count">' + upcoming + '</span></div>' +
+    '<div class="scorer"><span>Geregistreerd aanwezig</span><span class="count">' + totalPresent + '</span></div>' +
+    '<div class="scorer"><span>Geregistreerd afwezig</span><span class="count">' + totalAbsent + '</span></div>';
+
+  const totals = {};
+  for (const player of players) totals[player.id] = 0;
+
+  for (const match of data.matches) {
+    for (const player of players) {
+      totals[player.id] += Number(match.goals[player.id] || 0);
+    }
+  }
+
+  const ranked = players
+    .map(function (player) {
+      return { player: player, goals: totals[player.id] || 0 };
+    })
+    .filter(function (item) { return item.goals > 0; })
+    .sort(function (a, b) { return b.goals - a.goals || a.player.sort_order - b.player.sort_order; });
+
+  if (!ranked.length) {
+    scorersEl.innerHTML = '<div style="color:var(--muted)">Nog geen doelpunten geregistreerd.</div>';
+  } else {
+    scorersEl.innerHTML = ranked.map(function (item) {
+      return '<div class="scorer"><span>' + item.player.name + '</span><span class="count">' + item.goals + '</span></div>';
+    }).join("");
+  }
+
+  drawChart(ranked.slice(0, 5));
+}
+
+function drawChart(top) {
+  if (!top.length || !fixtures.length) {
+    chartEl.innerHTML = '<div style="color:var(--muted)">Nog onvoldoende gegevens voor de grafiek.</div>';
+    return;
+  }
+
+  const width = 760;
+  const height = 230;
+  const left = 38;
+  const right = 15;
+  const topPad = 15;
+  const bottom = 30;
+  const plotWidth = width - left - right;
+  const plotHeight = height - topPad - bottom;
+
+  const totals = {};
+  let max = 1;
+  for (const item of top) totals[item.player.id] = 0;
+
+  for (let i = 0; i < fixtures.length; i++) {
+    for (const item of top) {
+      totals[item.player.id] += Number(data.matches[i].goals[item.player.id] || 0);
+      if (totals[item.player.id] > max) max = totals[item.player.id];
+    }
+  }
+
+  let svg = '<svg class="chart" viewBox="0 0 ' + width + ' ' + height + '" role="img" aria-label="Cumulatieve doelpunten">';
+  svg += '<line x1="' + left + '" y1="' + topPad + '" x2="' + left + '" y2="' + (height - bottom) + '" stroke="#ccd4dc"/>';
+  svg += '<line x1="' + left + '" y1="' + (height - bottom) + '" x2="' + (width - right) + '" y2="' + (height - bottom) + '" stroke="#ccd4dc"/>';
+
+  for (const item of top) {
+    let cumulative = 0;
+    let points = [];
+
+    for (let i = 0; i < fixtures.length; i++) {
+      cumulative += Number(data.matches[i].goals[item.player.id] || 0);
+      const x = left + (plotWidth * i / Math.max(1, fixtures.length - 1));
+      const y = topPad + plotHeight - (cumulative / max * plotHeight);
+      points.push(x.toFixed(1) + "," + y.toFixed(1));
+    }
+
+    svg += '<polyline fill="none" stroke="#2f6fed" stroke-width="2" points="' + points.join(" ") + '"/>';
+  }
+
+  svg += '<text x="' + (left + 5) + '" y="14" font-size="10" fill="#6b7785">doelpunten</text>';
+  svg += '</svg>';
+  chartEl.innerHTML = svg;
+}
+
+async function loadAll() {
+  if (refreshing) return;
+  refreshing = true;
+  setConnection(false, "Gegevens ophalen…");
+
+  try {
+    const results = await Promise.all([
+      api("/players?select=id,name,is_fixed,sort_order&order=sort_order"),
+      api("/matches?select=id,match_date,opponent,home,match_time,goals_for,goals_against&order=match_date"),
+      api("/attendance?select=match_id,player_id,status"),
+      api("/goals?select=match_id,player_id,goal_count")
+    ]);
+
+    const playerRows = results[0] || [];
+    const matchRows = results[1] || [];
+    const attendanceRows = results[2] || [];
+    const goalRowsFromDb = results[3] || [];
+
+    players = playerRows.map(function (row) {
+      return {
+        id: row.id,
+        name: row.name,
+        is_fixed: row.is_fixed,
+        sort_order: row.sort_order
+      };
+    });
+
+    fixtures = matchRows.map(function (row) {
+      return {
+        id: row.id,
+        match_date: row.match_date,
+        opponent: row.opponent,
+        home: row.home,
+        match_time: row.match_time,
+        goals_for: row.goals_for,
+        goals_against: row.goals_against
+      };
+    });
+
+    data.matches = fixtures.map(function (fixture) {
+      return { attendance: {}, goals: {} };
+    });
+
+    const indexByMatchId = {};
+    fixtures.forEach(function (fixture, index) {
+      indexByMatchId[fixture.id] = index;
+    });
+
+    for (const row of attendanceRows) {
+      const index = indexByMatchId[row.match_id];
+      if (index === undefined) continue;
+      data.matches[index].attendance[row.player_id] = row.status === "present" ? "yes" : "no";
+    }
+
+    for (const row of goalRowsFromDb) {
+      const index = indexByMatchId[row.match_id];
+      if (index === undefined) continue;
+      data.matches[index].goals[row.player_id] = Number(row.goal_count || 0);
+    }
+
+    setConnection(true, "● Verbonden met teamdatabase");
+    render();
+  } catch (error) {
+    console.error("Supabase laden mislukt:", error);
+    setConnection(false, "● Verbinding mislukt: " + error.message);
+    matchesEl.innerHTML = '<div class="empty">De teamdatabase kon niet worden geladen. Open de browserconsole voor de technische foutmelding.</div>';
+  } finally {
+    refreshing = false;
+  }
+}
+
+document.getElementById("tabAll").addEventListener("click", function () {
+  currentTab = "all";
+  document.getElementById("tabAll").classList.add("active");
+  document.getElementById("tabAction").classList.remove("active");
+  renderMatches();
+});
+
+document.getElementById("tabAction").addEventListener("click", function () {
+  currentTab = "action";
+  document.getElementById("tabAction").classList.add("active");
+  document.getElementById("tabAll").classList.remove("active");
+  renderMatches();
+});
+
+document.querySelectorAll("[data-filter]").forEach(function (button) {
+  button.addEventListener("click", function () {
+    currentFilter = button.dataset.filter;
+    document.querySelectorAll("[data-filter]").forEach(function (b) {
+      b.classList.toggle("active", b === button);
+    });
+    renderMatches();
+  });
+});
+
+document.getElementById("refresh").addEventListener("click", function () {
+  loadAll();
+});
+
+loadAll();
+setInterval(function () {
+  loadAll();
+}, 5000);
+</script>
+</body>
+</html>.hint{background:#edf8f1;border-color:#cbead6}.hint p{font-size:13px;color:#375b45;margin:0}
 .empty{background:white;border:1px dashed #c9d5e3;padding:28px;text-align:center;border-radius:14px;color:var(--muted)}
 .modal-back{position:fixed;inset:0;background:#0c1d35a6;display:none;align-items:center;justify-content:center;padding:16px;z-index:5}.modal-back.open{display:flex}.modal{background:#fff;border-radius:16px;width:min(520px,100%);max-height:90vh;overflow:auto;padding:20px}.modal-head{display:flex;justify-content:space-between;gap:12px;align-items:center}.modal h2{font-size:20px;margin:0}.close{background:#edf1f6;color:#334}.goal-row{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #edf1f6}.goal-row button{background:#edf2f8;padding:7px 12px}.goal-row .count{font-weight:800;min-width:20px;text-align:center}.save{background:var(--blue);color:white;width:100%;margin-top:16px}.modal p{color:var(--muted);font-size:13px}
 .connection{font-size:12px;margin-top:8px}.connection.ok{color:#9fe5bb}.connection.err{color:#ffb4bb}
